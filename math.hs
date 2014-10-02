@@ -1,4 +1,4 @@
-module Main where
+module Math where
 
 import Data.List
 
