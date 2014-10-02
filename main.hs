@@ -29,7 +29,7 @@ factors 2 = [1,2]
 factors 3 = [1,3]
 factors 6 = [1,2,3,6]
 factors 12 = [1,2,3,4,6,12]
-factors n = factorsHelper n 1 []
+factors n = sort $ factorsHelper n 1 []
 
 
 -- it returns true if p is a palindrom
@@ -62,7 +62,6 @@ primeListHelper n i cur res
 primeList :: Int -> [Int]
 primeList n = primeListHelper n 1 2 []
 
-
 sumaPrimaHelper :: Int -> Int -> Int -> Int -> Int
 sumaPrimaHelper n i cur res
   | n == i = cur + res
@@ -72,8 +71,9 @@ sumaPrimaHelper n i cur res
 sumaPrima :: Int -> Int
 sumaPrima n = sumaPrimaHelper n 1 2 0
 
+-- it returns all positive primes under lim
 primesUnder :: Int -> [Int]
-primesUnder n = takeWhile (< n) $ iterate nextPrime 2 
+primesUnder lim = takeWhile (< lim) $ iterate nextPrime 2 
 
 sumPrimesHelper :: Int -> Int -> Int -> Int
 sumPrimesHelper n i res
@@ -105,30 +105,32 @@ colnum ls
 -- yeah... just to simplify things
 div' a b = (0 == rem a b)
 
--- it returns a list of primes less than lim
-sieve lim = takeWhile (< lim) (2 : primes [3,5..])
-
--- the helper for sieve
-primes (x:xs) = x : deleteBy (\x n -> div' n x) x (primes xs)
-
+-- it implements clojure's distinct behaviour
 distinct lst =  map head.group.sort $ lst
 
-combine ls k = filter (\x -> k == length x) (subsequences ls)
-
+-- it returns the greatest common divisors for all numbers in a list
 lgcd :: Integral a => [a] -> a
 lgcd (x:xs) = foldl gcd x xs
 
+-- it returns the least common multiple for all numbers in a list
 llcm :: Integral a => [a] -> a
 llcm (x:xs) = foldl lcm x xs
 
-indexOf e (x:xs) i
+indexOfHelper :: Eq a => a -> [a] -> Int -> Int
+indexOfHelper e (x:xs) i
   | e == x = i
-  | otherwise = indexOf e xs (succ i)
+  | otherwise = indexOfHelper e xs (succ i)
 
+-- it returns the index position of x in list xs
+indexOf :: Eq a => a -> [a] -> Int
+indexOf x xs = indexOfHelper x xs 1
+
+-- it returns all possible ways to take k elements from ls
+combinations :: (Num a, Eq a) => [a] -> Int -> [[a]]
 combinations ls k
   | k == 0 = [[]]
   | otherwise = [x:rs | x <- ls,
-                 rs <- (combinations (drop (indexOf x ls 1) ls) (pred k))]
+                 rs <- (combinations (drop (indexOf x ls) ls) (pred k))]
 
 
 
